@@ -103,7 +103,7 @@ class _SearchState extends State<Search> {
     print("${currentUserName}");
     print("${userName}");
 
-    List<String> users = [Constants.myName, userName];
+    List<String> users = [currentUserName, userName];
 
     String chatRoomId = getChatRoomId(currentUserName, userName);
     print(chatRoomId);

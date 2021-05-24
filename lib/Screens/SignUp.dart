@@ -21,27 +21,34 @@ class _SignUpState extends State<SignUp> {
   CollectionReference users = FirebaseFirestore.instance.collection('user');
 
   bool isLoading = false;
-
+  bool formCorrect = false;
   Future<void> signUp() async {
-    if (formKey.currentState.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-    }
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailEditingController.text,
-        password: passwordEditingController.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        SnackBar(content: Text('The password provided is too weak.'));
-      } else if (e.code == 'email-already-in-use') {
-        SnackBar(content: Text('The account already exists for that email.'));
+    // if (formKey.currentState.validate()) {
+    //   setState(() {
+    //     formCorrect = true;
+    //     isLoading = true;
+    //   });
+    // }
+
+    formCorrect = formKey.currentState.validate();
+    isLoading = formKey.currentState.validate();
+    if (formCorrect) {
+      print("Form validated");
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailEditingController.text,
+          password: passwordEditingController.text,
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          SnackBar(content: Text('The password provided is too weak.'));
+        } else if (e.code == 'email-already-in-use') {
+          SnackBar(content: Text('The account already exists for that email.'));
+        }
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -126,11 +133,13 @@ class _SignUpState extends State<SignUp> {
                               signUp().then((_) {
                                 addUser();
                               }).then((_) {
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatRoom(),
-                                    ));
+                                if (formCorrect) {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatRoom(),
+                                      ));
+                                }
                               });
                             },
                             child: Container(
